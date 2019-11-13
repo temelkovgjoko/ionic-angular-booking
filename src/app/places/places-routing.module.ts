@@ -37,7 +37,7 @@ const routes: Routes = [
                     },
                     {
                         path: ':placeId',
-                        loadChildren: 'offers/offer-bookings/offer-bookings.module#OfferBookingsPageModule'
+                        loadChildren: './offers/offer-bookings/offer-bookings.module#OfferBookingsPageModule'
                     }
                 ]
             },
@@ -54,7 +54,7 @@ const routes: Routes = [
         redirectTo: '/places/tabs/discover',
         pathMatch: 'full'
     }
-]
+] 
 @NgModule({
     imports: [RouterModule.forChild(routes)],
     exports: [RouterModule]
