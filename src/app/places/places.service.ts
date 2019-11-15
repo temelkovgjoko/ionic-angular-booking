@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Place } from './place.module';
+import { Place } from './place.model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,19 +11,25 @@ export class PlacesService {
       'Manhattan Mansion',
       'In the heart of NYC',
       'https://imgs.6sqft.com/wp-content/uploads/2014/06/21042533/Carnegie-Mansion-nyc.jpg',
-      149.99),
+      149.99,
+      new Date('2019-01-01'),
+      new Date('2019-12-31')),
     new Place(
       'p2',
       'Paris Mansion',
       'In Paris',
       'https://i.ytimg.com/vi/NQv9Z-LZ618/hqdefault.jpg',
-      189.99),
+      189.99,
+      new Date('2019-01-01'),
+      new Date('2019-12-31')),
     new Place(
       'p3',
       'Foggy Palace',
       'Not your average city trip!',
       'https://live.staticflickr.com/4711/26100810738_0f74f58b9b_b.jpg',
-      99.99)
+      99.99,
+      new Date('2019-01-01'),
+      new Date('2019-12-31'))
   ];
 
   constructor() { }

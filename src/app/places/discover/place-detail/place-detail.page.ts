@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ModalController, NavController, ActionSheetController } from '@ionic/angular';
 
 
-import { Place } from '../../place.module';
+import { Place } from '../../place.model';
 import { PlacesService } from '../../places.service';
 import { CreateBookingComponent } from '../../../bookings/create-booking/create-booking.component';
 
@@ -64,10 +64,9 @@ export class PlaceDetailPage implements OnInit {
   }
 
   openBookingModal(mode: 'select' | 'random') {
-    console.log(mode)
     this.modalCtrl.create({
       component: CreateBookingComponent,
-      componentProps: { selectedPlace: this.place }
+      componentProps: { selectedPlace: this.place, selectedMode: mode }
     })
       .then(modalEl => {
         modalEl.present();

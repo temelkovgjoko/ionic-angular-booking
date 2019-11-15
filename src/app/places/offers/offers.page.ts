@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { PlacesService } from '../places.service';
-import { Place } from '../place.module';
+import { Place } from '../place.model';
 import { IonItemSliding } from '@ionic/angular';
 import { Router } from '@angular/router';
 
