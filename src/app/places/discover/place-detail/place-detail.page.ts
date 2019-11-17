@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { ModalController, NavController, ActionSheetController, LoadingController } from '@ionic/angular';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ModalController, NavController, ActionSheetController, LoadingController, AlertController } from '@ionic/angular';
 
 
 import { Place } from '../../place.model';
@@ -19,6 +19,7 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
   place: Place;
   isBookable = false;
   placeSub: Subscription;
+  isLoading = false;
   constructor(
     private navCtrl: NavController,
     private route: ActivatedRoute,
@@ -27,7 +28,9 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
     private actionSheetCtrl: ActionSheetController,
     private bookingService: BookingService,
     private loadingCtrl: LoadingController,
-    private authService: AuthService
+    private authService: AuthService,
+    private alertCtrl: AlertController,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -36,18 +39,30 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
         this.navCtrl.navigateBack('/places/tabs/discover');
         return;
       }
+      this.isLoading = true
       this.placeSub = this.placesService
         .getPlace(paramMap.get('placeId'))
         .subscribe(place => {
           this.place = place;
           this.isBookable = place.userId !== this.authService.userId;
+          this.isLoading = false;
+        }, error => {
+          this.alertCtrl.create({
+            header: 'An error ocurred!',
+            message: 'Could not load place.',
+            buttons: [{
+              text: 'Okay',
+              handler: () => {
+                this.router.navigate(['/places/tabs/discover']);
+              }
+            }]
+          }).then(alertEl => alertEl.present())
         });
     })
   }
 
 
   onBookPlace() {
-
     this.actionSheetCtrl.create({
       header: 'Choose an action',
       buttons: [

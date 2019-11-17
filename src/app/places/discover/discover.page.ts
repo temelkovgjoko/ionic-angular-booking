@@ -12,7 +12,7 @@ import { AuthService } from 'src/app/auth/auth.service';
   styleUrls: ['./discover.page.scss'],
 })
 export class DiscoverPage implements OnInit, OnDestroy {
-
+  isLoading = false;
   constructor(
     private placesService: PlacesService,
     private authService: AuthService
@@ -28,6 +28,13 @@ export class DiscoverPage implements OnInit, OnDestroy {
       this.relevantPlaces = this.loadedPlaces;
       this.listLoadedPlaces = this.loadedPlaces.slice(1)
     });
+  }
+
+  ionViewWillEnter() {
+    this.isLoading = true
+    this.placesService.fetchPlaces().subscribe(()=>{
+      this.isLoading = false;
+    })
   }
 
   onFilterUpdate(event: CustomEvent<SegmentChangeEventDetail>) {
