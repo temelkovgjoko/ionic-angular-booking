@@ -4,6 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { take, tap, delay, switchMap, map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment'
 
 interface BookingData {
     bookedFrom: string
@@ -52,7 +53,7 @@ export class BookingService {
             dateFrom,
             dateTo
         );
-        return this.http.post<{ name: string }>('https://ionic-angular-project-58c0b.firebaseio.com/bookings.json',
+        return this.http.post<{ name: string }>(`${environment.firebaseURL}/bookings.json`,
             { ...newBooking, id: null }
         ).pipe(switchMap(resData => {
             generatedId = resData.name;
@@ -68,7 +69,7 @@ export class BookingService {
 
     cancelBooking(bookingId: string) {
         return this.http
-            .delete(`https://ionic-angular-project-58c0b.firebaseio.com/bookings/${bookingId}.json`)
+            .delete(`${environment.firebaseURL}/${bookingId}.json`)
             .pipe(
                 switchMap(() => {
                     return this.bookings;
@@ -81,7 +82,7 @@ export class BookingService {
     }
 
     fetchBookings() {
-        return this.http.get<{ [key: string]: BookingData }>(`https://ionic-angular-project-58c0b.firebaseio.com/bookings.json?orderBy="userId"&equalTo="${this.authService.userId}"`)
+        return this.http.get<{ [key: string]: BookingData }>(`${environment.firebaseURL}/bookings.json?orderBy="userId"&equalTo="${this.authService.userId}"`)
             .pipe(map(bookingData => {
                 const bookings = [];
                 for (const key in bookingData) {
