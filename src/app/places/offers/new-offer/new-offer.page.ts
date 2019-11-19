@@ -1,19 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { PlacesService } from '../../places.service';
 import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
+
+import { PlacesService } from '../../places.service';
 import { PlaceLocation } from '../../location.model';
 
 function base64toBlob(base64Data, contentType) {
   contentType = contentType || '';
   const sliceSize = 1024;
-  const byteCharacters = atob(base64Data);
+  const byteCharacters = window.atob(base64Data);
   const bytesLength = byteCharacters.length;
   const slicesCount = Math.ceil(bytesLength / sliceSize);
   const byteArrays = new Array(slicesCount);
 
-  for (var sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
+  for (let sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
     const begin = sliceIndex * sliceSize;
     const end = Math.min(begin + sliceSize, bytesLength);
 
@@ -26,18 +27,19 @@ function base64toBlob(base64Data, contentType) {
   return new Blob(byteArrays, { type: contentType });
 }
 
-
 @Component({
   selector: 'app-new-offer',
   templateUrl: './new-offer.page.html',
-  styleUrls: ['./new-offer.page.scss'],
+  styleUrls: ['./new-offer.page.scss']
 })
 export class NewOfferPage implements OnInit {
   form: FormGroup;
+
   constructor(
     private placesService: PlacesService,
     private router: Router,
-    private loadingCtrl: LoadingController) { }
+    private loadingCtrl: LoadingController
+  ) {}
 
   ngOnInit() {
     this.form = new FormGroup({
@@ -61,9 +63,7 @@ export class NewOfferPage implements OnInit {
         updateOn: 'blur',
         validators: [Validators.required]
       }),
-      location: new FormControl(null, {
-        validators: [Validators.required]
-      }),
+      location: new FormControl(null, { validators: [Validators.required] }),
       image: new FormControl(null)
     });
   }
@@ -76,7 +76,10 @@ export class NewOfferPage implements OnInit {
     let imageFile;
     if (typeof imageData === 'string') {
       try {
-        const imageFile = base64toBlob(imageData.replace('data:image/jpeg;base64,', ''), 'image/jpeg');
+        imageFile = base64toBlob(
+          imageData.replace('data:image/jpeg;base64,', ''),
+          'image/jpeg'
+        );
       } catch (error) {
         console.log(error);
         return;
@@ -88,27 +91,30 @@ export class NewOfferPage implements OnInit {
   }
 
   onCreateOffer() {
-    if (!this.form.valid) {
+    if (!this.form.valid || !this.form.get('image').value) {
       return;
     }
-    this.loadingCtrl.create({
-      message: 'Creating place...'
-    }).then(loadingEl => {
-      loadingEl.present()
-      this.placesService
-        .addPlace(
-          this.form.value.title,
-          this.form.value.description,
-          +this.form.value.price,
-          new Date(this.form.value.dateFrom),
-          new Date(this.form.value.dateTo),
-          this.form.value.location
-        )
-        .subscribe(() => {
-          loadingEl.dismiss()
-          this.form.reset()
-          this.router.navigate(['/places/tabs/offers'])
-        })
-    })
+    console.log(this.form.value);
+    this.loadingCtrl
+      .create({
+        message: 'Creating place...'
+      })
+      .then(loadingEl => {
+        loadingEl.present();
+        this.placesService
+          .addPlace(
+            this.form.value.title,
+            this.form.value.description,
+            +this.form.value.price,
+            new Date(this.form.value.dateFrom),
+            new Date(this.form.value.dateTo),
+            this.form.value.location
+          )
+          .subscribe(() => {
+            loadingEl.dismiss();
+            this.form.reset();
+            this.router.navigate(['/places/tabs/offers']);
+          });
+      });
   }
 }
