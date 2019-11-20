@@ -12,7 +12,11 @@ import { NgForm } from '@angular/forms';
 export class AuthPage implements OnInit {
   isLoading = false;
   isLogin = true;
-  constructor(private authService: AuthService, private router: Router, private loadingCtrl: LoadingController) { }
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private loadingCtrl: LoadingController
+  ) { }
 
   ngOnInit() { }
 
@@ -42,6 +46,9 @@ export class AuthPage implements OnInit {
       // Send a request to login servers
     } else {
       // Send a request to signup servers
+      this.authService.signup(email, password).subscribe(resData => {
+        console.log(resData);
+      })
     }
 
 
