@@ -41,30 +41,39 @@ export class BookingService {
         dateFrom: Date,
         dateTo: Date) {
         let generatedId: string;
-        const newBooking = new Booking(
-            Math.random().toString(),
-            placeId,
-            this.authService.userId,
-            placeTitle,
-            placeImage,
-            firstName,
-            lastName,
-            guestNumber,
-            dateFrom,
-            dateTo
-        );
-        return this.http.post<{ name: string }>(`${environment.firebaseURL}/bookings.json`,
-            { ...newBooking, id: null }
-        ).pipe(switchMap(resData => {
-            generatedId = resData.name;
-            return this.bookings;
-        }),
+        let newBooking: Booking;
+        return this.authService.userId.pipe(
             take(1),
-            tap(bookings => {
-                newBooking.id = generatedId;
-                this._bookings.next(bookings.concat(newBooking))
-            })
-        )
+            switchMap(userId => {
+                if (!userId) {
+                    throw new Error('No user id found!')
+                }
+                newBooking = new Booking(
+                    Math.random().toString(),
+                    placeId,
+                    userId,
+                    placeTitle,
+                    placeImage,
+                    firstName,
+                    lastName,
+                    guestNumber,
+                    dateFrom,
+                    dateTo
+                );
+                return this.http.post<{ name: string }>(`${environment.firebaseURL}/bookings.json`,
+                    { ...newBooking, id: null }
+                )
+            }))
+            .pipe(switchMap(resData => {
+                generatedId = resData.name;
+                return this.bookings;
+            }),
+                take(1),
+                tap(bookings => {
+                    newBooking.id = generatedId;
+                    this._bookings.next(bookings.concat(newBooking))
+                })
+            )
     }
 
     cancelBooking(bookingId: string) {
@@ -82,31 +91,38 @@ export class BookingService {
     }
 
     fetchBookings() {
-        return this.http.get<{ [key: string]: BookingData }>(`${environment.firebaseURL}/bookings.json?orderBy="userId"&equalTo="${this.authService.userId}"`)
-            .pipe(map(bookingData => {
-                const bookings = [];
-                for (const key in bookingData) {
-                    if (bookingData.hasOwnProperty(key)) {
-                        bookings.push(
-                            new Booking(
-                                key,
-                                bookingData[key].placeId,
-                                bookingData[key].userId,
-                                bookingData[key].placeTitle,
-                                bookingData[key].placeImage,
-                                bookingData[key].firstName,
-                                bookingData[key].lastName,
-                                bookingData[key].guestNumber,
-                                new Date(bookingData[key].bookedFrom),
-                                new Date(bookingData[key].bookedTo),
-                            )
-                        )
-                    }
+        return this.authService.userId.pipe(
+            take(1),
+            switchMap(userId => {
+                if (!userId) {
+                    throw new Error('User not found!')
                 }
-                return bookings;
-            }), tap(bookings => {
-                this._bookings.next(bookings)
+                return this.http.get<{ [key: string]: BookingData }>(`${environment.firebaseURL}/bookings.json?orderBy="userId"&equalTo="${userId}"`)
             })
-            )
+        ).pipe(map(bookingData => {
+            const bookings = [];
+            for (const key in bookingData) {
+                if (bookingData.hasOwnProperty(key)) {
+                    bookings.push(
+                        new Booking(
+                            key,
+                            bookingData[key].placeId,
+                            bookingData[key].userId,
+                            bookingData[key].placeTitle,
+                            bookingData[key].placeImage,
+                            bookingData[key].firstName,
+                            bookingData[key].lastName,
+                            bookingData[key].guestNumber,
+                            new Date(bookingData[key].bookedFrom),
+                            new Date(bookingData[key].bookedTo),
+                        )
+                    )
+                }
+            }
+            return bookings;
+        }), tap(bookings => {
+            this._bookings.next(bookings)
+        })
+        )
     }
 }
