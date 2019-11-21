@@ -26,8 +26,7 @@ exports.storeImage = functions.https.onRequest((req, res) => {
     }
 
     let idToken;
-    idToken = req.headers.authorization.split('Bearer ')[1]; b
-
+    idToken = req.headers.authorization.split('Bearer ')[1];
     const busboy = new Busboy({ headers: req.headers });
     let uploadData;
     let oldImagePath;
@@ -49,8 +48,7 @@ exports.storeImage = functions.https.onRequest((req, res) => {
         imagePath = oldImagePath;
       }
 
-      return fbAdmin.auth().verifyIdToken(idToken).then(decodedToken => {
-        console.log(uploadData.type);
+      return fbAdmin.auth().verifyIdToken(idToken).then(() => {
         return storage
           .bucket('ionic-angular-project-58c0b.appspot.com')
           .upload(uploadData.filePath, {

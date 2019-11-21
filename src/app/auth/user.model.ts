@@ -1,4 +1,7 @@
-export class User {
+
+
+  
+  export class User {
     constructor(
         public id: string,
         public email: string,
@@ -17,6 +20,6 @@ export class User {
         if (!this.token) {
             return 0;
         }
-        return - this.tokenExpirationDate.getTime() - new Date().getTime();
+        return  this.tokenExpirationDate.getTime() - new Date().getTime();
     }
 }
